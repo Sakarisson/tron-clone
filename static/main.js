@@ -1,15 +1,22 @@
 'use strict'
+
+// Configuration object
 const config = {
     windowSize: 800
 }
 
-const DIR = {
+// A constant direction reference object
+const DIR = Object.freeze({
     RIGHT: new Point(1, 0),
     LEFT: new Point(-1, 0),
     UP: new Point(0, -1),
     DOWN: new Point(0, 1)
-}
+})
 
+/**
+ * Point object. Contains an x and y position as well
+ * as some rudimentary operations
+ */
 function Point(x, y) {
     this.x = x
     this.y = y
@@ -31,26 +38,41 @@ function Point(x, y) {
         }
         return new Point(rX, rY)
     }
+
+    this.clone = () => {
+        return new Point(this.x, this.y)
+    }
 }
 
+// Player array
 const players = []
 
+/**
+ * Player object. Contains the main logic for the players
+ */
 function Player(name) {
     this.name = name
 
-    this.points = [new Point(config.windowSize / 2, config.windowSize / 2), new Point(config.windowSize / 2, config.windowSize / 2)]
+    this.points = [new Point(config.windowSize / 2, config.windowSize / 2), new Point(config.windowSize / 2, config.windowSize / 2)] // Initialize player with two opints in the middle
 
-    this.moveDir = DIR.RIGHT
+    this.moveDir = DIR.RIGHT.clone() // Initial move direction
 
+    // Change move direction if possible
     this.changeDirection = (direction) => {
-        if(direction != this.moveDir && direction != this.moveDir.reverse()) {
-            this.points.push(new Point(_.last(this.points).x, _.last(this.points).y))
-            this.moveDir = direction
+        if((direction.x != this.moveDir.x) && (direction.y != this.moveDir.y) && (direction.x != this.moveDir.reverse().x) && (direction.y != this.moveDir.reverse().y)) {
+            this.points.push(_.last(this.points).clone()) // Add new point, which is identical to the current last point
+            this.moveDir = direction.clone() // Change direction
         }
     }
 
     this.move = () => {
-        _.last(this.points).move(this.moveDir)
+        _.last(this.points).move(this.moveDir) // Move the last point by moveDir
+    }
+
+    this.drawPoints = () => {
+        for(let i = 1; i < this.points.length; i++) {
+            line(this.points[i - 1].x, this.points[i - 1].y, this.points[i].x, this.points[i].y)
+        }
     }
 }
 
@@ -63,9 +85,7 @@ function draw() {
     clear()
     strokeWeight(2)
     _.each(players, (player) => {
-        for(let i = 1; i < player.points.length; i++) {
-            line(player.points[i - 1].x, player.points[i - 1].y, player.points[i].x, player.points[i].y)
-        }
+        player.drawPoints()
         player.move()
     })
 }
