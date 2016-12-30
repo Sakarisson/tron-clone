@@ -26,22 +26,9 @@ function Point(x, y) {
         this.y += direction.y
     }
 
-    this.reverse = () => {
-        let rX = 0, 
-            rY = 0
+    this.reverse = () => new Point(-this.x, -this.y)
 
-        if(this.x == 0) {
-            rY -= this.y
-        }
-        else {
-            rX -= this.x
-        }
-        return new Point(rX, rY)
-    }
-
-    this.clone = () => {
-        return new Point(this.x, this.y)
-    }
+    this.clone = () => new Point(this.x, this.y)
 }
 
 // Player array
@@ -84,7 +71,7 @@ function setup() {
 function draw() {
     clear()
     strokeWeight(2)
-    _.each(players, (player) => {
+    _.each(players, player => {
         player.drawPoints()
         player.move()
     })
