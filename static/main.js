@@ -18,6 +18,19 @@ function Point(x, y) {
         this.x += direction.x
         this.y += direction.y
     }
+
+    this.reverse = () => {
+        let rX = 0, 
+            rY = 0
+
+        if(this.x == 0) {
+            rY -= this.y
+        }
+        else {
+            rX -= this.x
+        }
+        return new Point(rX, rY)
+    }
 }
 
 const players = []
@@ -30,8 +43,10 @@ function Player(name) {
     this.moveDir = DIR.RIGHT
 
     this.changeDirection = (direction) => {
-        this.points.push(_.last(this.points))
-        this.moveDir = direction
+        if(direction != this.moveDir && direction != this.moveDir.reverse()) {
+            this.points.push(new Point(_.last(this.points).x, _.last(this.points).y))
+            this.moveDir = direction
+        }
     }
 
     this.move = () => {
@@ -46,12 +61,11 @@ function setup() {
 
 function draw() {
     clear()
+    strokeWeight(2)
     _.each(players, (player) => {
-        _.each(player.points, (point, i) => {
-            if(i > 0) {
-                line(player.points[i - 1].x, player.points[i - 1].y, player.points[i].x, player.points[i].y)
-            }
-        })
+        for(let i = 1; i < player.points.length; i++) {
+            line(player.points[i - 1].x, player.points[i - 1].y, player.points[i].x, player.points[i].y)
+        }
         player.move()
     })
 }
